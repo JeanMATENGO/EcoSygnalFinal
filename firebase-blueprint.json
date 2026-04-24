@@ -1,0 +1,77 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "User profile with role assignment.",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["user", "technician", "admin"] },
+        "displayName": { "type": "string" }
+      },
+      "required": ["email", "role"]
+    },
+    "Report": {
+      "title": "Service Outage Report",
+      "description": "A report of a water or electricity outage.",
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "enum": ["water", "electricity"] },
+        "zone": { "type": "string" },
+        "avenue": { "type": "string" },
+        "quartier": { "type": "string" },
+        "urgency": { "type": "string", "enum": ["urgent", "normal"] },
+        "status": { "type": "string", "enum": ["reported", "validating", "repair", "resolved"] },
+        "description": { "type": "string" },
+        "reporterId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "confirmedCount": { "type": "number" },
+        "isConfirmed": { "type": "boolean" },
+        "lat": { "type": "number" },
+        "lng": { "type": "number" }
+      },
+      "required": ["type", "zone", "status", "reporterId", "createdAt", "urgency"]
+    },
+    "Comment": {
+      "title": "Agent Comment",
+      "description": "Feedback from technical agents on reports.",
+      "type": "object",
+      "properties": {
+        "reportId": { "type": "string" },
+        "authorId": { "type": "string" },
+        "authorRole": { "type": "string" },
+        "text": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["reportId", "authorId", "text", "createdAt"]
+    },
+    "GlobalConfig": {
+      "title": "System Configuration",
+      "description": "Global settings for the application.",
+      "type": "object",
+      "properties": {
+        "isAppEnabled": { "type": "boolean" }
+      },
+      "required": ["isAppEnabled"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles and roles."
+    },
+    "/reports/{reportId}": {
+      "schema": "Report",
+      "description": "Outage reports."
+    },
+    "/reports/{reportId}/comments/{commentId}": {
+      "schema": "Comment",
+      "description": "Comments on specific reports."
+    },
+    "/config/global": {
+      "schema": "GlobalConfig",
+      "description": "Application kill switch."
+    }
+  }
+}

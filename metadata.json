@@ -1,0 +1,12 @@
+{
+  "name": "EcoSignal",
+  "description": "Système temps réel de signalement et d'analyse des coupures d'eau et d'électricité pour Bukavu, avec IA intégrée et tableau de bord admin.",
+  "requestFramePermissions": [
+    "geolocation"
+  ],
+  "majorCapabilities": [
+    "AI-powered analytics",
+    "Real-time monitoring",
+    "Admin control panel"
+  ]
+}

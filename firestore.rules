@@ -1,0 +1,56 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function getRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (getRole() == 'admin' || request.auth.token.email == 'jeanmatengo5@gmail.com');
+    }
+
+    function isAgent() {
+      return isSignedIn() && (getRole() == 'agent_water' || getRole() == 'agent_electricity' || isAdmin());
+    }
+
+    function isAppEnabled() {
+      let configPath = /databases/$(database)/documents/config/global;
+      return !exists(configPath) || get(configPath).data.isAppEnabled == true;
+    }
+
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin() || isOwner(userId);
+    }
+
+    match /reports/{reportId} {
+      allow read: if isAppEnabled() || isAdmin();
+      allow create: if isSignedIn() && isAppEnabled();
+      allow update: if isAgent() || isAdmin();
+      allow delete: if isAdmin();
+      
+      match /comments/{commentId} {
+        allow read: if isSignedIn() && isAppEnabled();
+        allow create: if isAgent();
+      }
+    }
+
+    match /config/global {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}
